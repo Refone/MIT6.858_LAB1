@@ -15,8 +15,12 @@
 #include <string.h>
 #include <unistd.h>
 
+/*
 #define __func_invoke (printf("__func_invoke: %s [line:%d] %s\n", \
                        __FILE__, __LINE__, __func__))
+*/
+
+#define __func_invoke ;
 
 void touch(const char *name) {
     __func_invoke;
@@ -78,6 +82,11 @@ const char *http_request_line(int fd, char *reqpath, char *env, size_t *env_len)
     if (http_read_line(fd, buf, sizeof(buf)) < 0)
         return "Socket IO error";
 
+	/* printf:
+	 * buf:GET / HTTP/1.0
+	 */
+	//printf("buf:%s\n", buf);
+
     /* Parse request like "GET /foo.html HTTP/1.0" */
     sp1 = strchr(buf, ' ');
     if (!sp1)
@@ -97,8 +106,11 @@ const char *http_request_line(int fd, char *reqpath, char *env, size_t *env_len)
     if (strcmp(buf, "GET") && strcmp(buf, "POST"))
         return "Unsupported request (not GET or POST)";
 
+	printf("### envp1: %s\n", env);
     envp += sprintf(envp, "REQUEST_METHOD=%s", buf) + 1;
+	printf("### envp2: %s\n", env);
     envp += sprintf(envp, "SERVER_PROTOCOL=%s", sp2) + 1;
+	printf("### envp3: %s\n", env);
 
     /* parse out query string, e.g. "foo.py?user=bob" */
     if ((qp = strchr(sp1, '?')))
@@ -110,9 +122,13 @@ const char *http_request_line(int fd, char *reqpath, char *env, size_t *env_len)
     /* decode URL escape sequences in the requested path into reqpath */
     url_decode(reqpath, sp1);
 
+	printf("### reqpath: %s\n",reqpath);
+
     envp += sprintf(envp, "REQUEST_URI=%s", reqpath) + 1;
+	printf("### envp4: %s\n", env);
 
     envp += sprintf(envp, "SERVER_NAME=zoobar.org") + 1;
+	printf("### envp5: %s\n", env);
 
     *envp = 0;
     *env_len = envp - env + 1;
@@ -291,7 +307,10 @@ void http_serve(int fd, const char *name)
     getcwd(pn, sizeof(pn));
     setenv("DOCUMENT_ROOT", pn, 1);
 
+//	printf("### http_serve: %s\n", pn);
     strcat(pn, name);
+//	printf("### http_serve: %s\n", pn);
+
     split_path(pn);
 
     if (!stat(pn, &st))
@@ -358,7 +377,9 @@ void dir_join(char *dst, const char *dirname, const char *filename) {
     strcpy(dst, dirname);
     if (dst[strlen(dst) - 1] != '/')
         strcat(dst, "/");
+//	printf("### dir_join: dst:%s\n", dst);
     strcat(dst, filename);
+//	printf("### dir_join: dst:%s\n", dst);
 }
 
 void http_serve_directory(int fd, const char *pn) {
@@ -453,6 +474,9 @@ void http_serve_executable(int fd, const char *pn)
 void url_decode(char *dst, const char *src)
 {
     __func_invoke;
+
+	printf("### url_decode: src:%s\n", src);
+
     for (;;)
     {
         if (src[0] == '%' && src[1] && src[2])

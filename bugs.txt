@@ -15,3 +15,35 @@ another description.
     <paste offending line(s) of code here>
 
 # many more come here
+
+[http.c:311]
+if the strength of name is long enough, "strcat(pn, name)" can makes pn larger than 1024 bytes, potentially leading into a buffer overflow. pn stores the full path of the requring file(eg. "/home/httpd/lab/index.html")
+
+	strcat(pn, name);
+
+[http.c:377]
+in dir_join. long enough dirname input can overwrite dst, which stores the full path of requiring file(eg. "/home/httpd/lab/index.html"). And there's no checking in function which invoke dir_join().
+
+	strcpy(dst, dirname);
+
+[http.c:110]
+long enough buf can overwrites envp, buf is the method of request(eg. POST & GET), melicious user may input illegally.
+
+	envp += sprintf(envp, "REQUEST_METHOD=%s", buf) + 1;
+
+[http.c:112]
+same as aboving reason.
+
+	envp += sprintf(envp, "SERVER_PROTOCOL=%s", sp2) + 1;
+
+[http.c:127]
+unsafe use of sprintf.
+	
+	envp += sprintf(envp, "REQUEST_URI=%s", reqpath) + 1;
+
+[http.c:127]
+unsafe use of sprintf.
+
+	envp += sprintf(envp, "SERVER_NAME=zoobar.org") + 1;
+ 
+
