@@ -106,11 +106,10 @@ const char *http_request_line(int fd, char *reqpath, char *env, size_t *env_len)
     if (strcmp(buf, "GET") && strcmp(buf, "POST"))
         return "Unsupported request (not GET or POST)";
 
-	printf("### envp1: %s\n", env);
+	printf("### envp1-buf: %s\n", buf);
     envp += sprintf(envp, "REQUEST_METHOD=%s", buf) + 1;
-	printf("### envp2: %s\n", env);
+	printf("### envp2-sp2: %s\n", sp2);
     envp += sprintf(envp, "SERVER_PROTOCOL=%s", sp2) + 1;
-	printf("### envp3: %s\n", env);
 
     /* parse out query string, e.g. "foo.py?user=bob" */
     if ((qp = strchr(sp1, '?')))
@@ -123,12 +122,9 @@ const char *http_request_line(int fd, char *reqpath, char *env, size_t *env_len)
     url_decode(reqpath, sp1);
 
 	printf("### reqpath: %s\n",reqpath);
-
     envp += sprintf(envp, "REQUEST_URI=%s", reqpath) + 1;
-	printf("### envp4: %s\n", env);
 
     envp += sprintf(envp, "SERVER_NAME=zoobar.org") + 1;
-	printf("### envp5: %s\n", env);
 
     *envp = 0;
     *env_len = envp - env + 1;
