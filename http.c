@@ -15,15 +15,7 @@
 #include <string.h>
 #include <unistd.h>
 
-/*
-#define __func_invoke (printf("__func_invoke: %s [line:%d] %s\n", \
-                       __FILE__, __LINE__, __func__))
-*/
-
-#define __func_invoke ;
-
 void touch(const char *name) {
-    __func_invoke;
     if (access("/tmp/grading", F_OK) < 0)
         return;
 
@@ -37,7 +29,6 @@ void touch(const char *name) {
 
 int http_read_line(int fd, char *buf, size_t size)
 {
-    __func_invoke;
     size_t i = 0;
 
     for (;;)
@@ -72,7 +63,6 @@ int http_read_line(int fd, char *buf, size_t size)
 
 const char *http_request_line(int fd, char *reqpath, char *env, size_t *env_len)
 {
-    __func_invoke;
     static char buf[8192];      /* static variables are not on the stack */
     char *sp1, *sp2, *qp, *envp = env;
 
@@ -81,11 +71,6 @@ const char *http_request_line(int fd, char *reqpath, char *env, size_t *env_len)
 
     if (http_read_line(fd, buf, sizeof(buf)) < 0)
         return "Socket IO error";
-
-	/* printf:
-	 * buf:GET / HTTP/1.0
-	 */
-	//printf("buf:%s\n", buf);
 
     /* Parse request like "GET /foo.html HTTP/1.0" */
     sp1 = strchr(buf, ' ');
@@ -106,9 +91,7 @@ const char *http_request_line(int fd, char *reqpath, char *env, size_t *env_len)
     if (strcmp(buf, "GET") && strcmp(buf, "POST"))
         return "Unsupported request (not GET or POST)";
 
-	printf("### envp1-buf: %s\n", buf);
     envp += sprintf(envp, "REQUEST_METHOD=%s", buf) + 1;
-	printf("### envp2-sp2: %s\n", sp2);
     envp += sprintf(envp, "SERVER_PROTOCOL=%s", sp2) + 1;
 
     /* parse out query string, e.g. "foo.py?user=bob" */
@@ -121,7 +104,6 @@ const char *http_request_line(int fd, char *reqpath, char *env, size_t *env_len)
     /* decode URL escape sequences in the requested path into reqpath */
     url_decode(reqpath, sp1);
 
-	printf("### reqpath: %s\n",reqpath);
     envp += sprintf(envp, "REQUEST_URI=%s", reqpath) + 1;
 
     envp += sprintf(envp, "SERVER_NAME=zoobar.org") + 1;
@@ -133,7 +115,6 @@ const char *http_request_line(int fd, char *reqpath, char *env, size_t *env_len)
 
 const char *http_request_headers(int fd)
 {
-    __func_invoke;
     static char buf[8192];      /* static variables are not on the stack */
     int i;
     char value[512];
@@ -193,7 +174,6 @@ const char *http_request_headers(int fd)
 
 void http_err(int fd, int code, char *fmt, ...)
 {
-    __func_invoke;
     fdprintf(fd, "HTTP/1.0 %d Error\r\n", code);
     fdprintf(fd, "Content-Type: text/html\r\n");
     fdprintf(fd, "\r\n");
@@ -215,7 +195,6 @@ void http_err(int fd, int code, char *fmt, ...)
 /* split path into script name and path info */
 void split_path(char *pn)
 {
-    __func_invoke;
     struct stat st;
     char *slash = NULL;
 
@@ -270,7 +249,6 @@ static int cgi_gid = -1;
 void
 http_set_executable_uid_gid(int uid, int gid)
 {
-    __func_invoke;
     cgi_uid = uid;
     cgi_gid = gid;
 }
@@ -278,7 +256,6 @@ http_set_executable_uid_gid(int uid, int gid)
 static int
 valid_cgi_script(struct stat *st)
 {
-    __func_invoke;
     if (!S_ISREG(st->st_mode))
         return 0;
 
@@ -295,7 +272,6 @@ valid_cgi_script(struct stat *st)
 
 void http_serve(int fd, const char *name)
 {
-    __func_invoke;
     void (*handler)(int, const char *) = http_serve_none;
     char pn[1024];
     struct stat st;
@@ -303,10 +279,7 @@ void http_serve(int fd, const char *name)
     getcwd(pn, sizeof(pn));
     setenv("DOCUMENT_ROOT", pn, 1);
 
-//	printf("### http_serve: %s\n", pn);
     strcat(pn, name);
-//	printf("### http_serve: %s\n", pn);
-
     split_path(pn);
 
     if (!stat(pn, &st))
@@ -325,13 +298,11 @@ void http_serve(int fd, const char *name)
 
 void http_serve_none(int fd, const char *pn)
 {
-    __func_invoke;
     http_err(fd, 404, "File does not exist: %s", pn);
 }
 
 void http_serve_file(int fd, const char *pn)
 {
-    __func_invoke;
     int filefd;
     off_t len = 0;
 
@@ -373,13 +344,10 @@ void dir_join(char *dst, const char *dirname, const char *filename) {
     strcpy(dst, dirname);
     if (dst[strlen(dst) - 1] != '/')
         strcat(dst, "/");
-//	printf("### dir_join: dst:%s\n", dst);
     strcat(dst, filename);
-//	printf("### dir_join: dst:%s\n", dst);
 }
 
 void http_serve_directory(int fd, const char *pn) {
-    __func_invoke;
     /* for directories, use index.html or similar in that directory */
     static const char * const indices[] = {"index.html", "index.php", "index.cgi", NULL};
     char name[1024];
@@ -404,7 +372,6 @@ void http_serve_directory(int fd, const char *pn) {
 
 void http_serve_executable(int fd, const char *pn)
 {
-    __func_invoke;
     char buf[1024], headers[4096], *pheaders = headers;
     int pipefd[2], statusprinted = 0, ret, headerslen = 4096;
 
@@ -469,10 +436,6 @@ void http_serve_executable(int fd, const char *pn)
 
 void url_decode(char *dst, const char *src)
 {
-    __func_invoke;
-
-	printf("### url_decode: src:%s\n", src);
-
     for (;;)
     {
         if (src[0] == '%' && src[1] && src[2])
@@ -505,7 +468,6 @@ void url_decode(char *dst, const char *src)
 
 void env_deserialize(const char *env, size_t len)
 {
-    __func_invoke;
     for (;;)
     {
         char *p = strchr(env, '=');
@@ -523,7 +485,6 @@ void env_deserialize(const char *env, size_t len)
 
 void fdprintf(int fd, char *fmt, ...)
 {
-    __func_invoke;
     char *s = 0;
 
     va_list ap;
@@ -537,7 +498,6 @@ void fdprintf(int fd, char *fmt, ...)
 
 ssize_t sendfd(int socket, const void *buffer, size_t length, int fd)
 {
-    __func_invoke;
     struct iovec iov = {(void *)buffer, length};
     char buf[CMSG_LEN(sizeof(int))];
     struct cmsghdr *cmsg = (struct cmsghdr *)buf;
@@ -559,7 +519,6 @@ ssize_t sendfd(int socket, const void *buffer, size_t length, int fd)
 
 ssize_t recvfd(int socket, void *buffer, size_t length, int *fd)
 {
-    __func_invoke;
     struct iovec iov = {buffer, length};
     char buf[CMSG_LEN(sizeof(int))];
     struct cmsghdr *cmsg = (struct cmsghdr *)buf;
