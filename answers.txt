@@ -16,18 +16,18 @@ Exercise 4:
 	stack-states:
 
 		+--------------+
-		|			   |
+		|              |
 		|  0xbfffde14  |	stores "/home/httpd/grades.txt"
 		+--------------+
 		|  0xbfffde10  |	??  -->  pointer to "/home/httpd/grades.txt" (0xbfffde14)
 		+--------------+
 		|  0xbfffde0c  |	retaddr --> system exit() address
 		+--------------+
-		|	 ......	   |
+		|    ......    |
 		+--------------+
 		|  0xbfffddfc  |	handler --> system unlink() address
 		+--------------+
-		|	 ......	   |
+		|    ......    |
 		+--------------+
 
 	we changed the function pointer handler, when goes to handler(...), it exactly
@@ -39,7 +39,7 @@ Exercise 4:
 	stack-state:
 		
 		+--------------+
-		|			   |
+		|              |
 		|  0xbfffde16  |	stores "/home/httpd/grades.txt"
 		+--------------+
 		|  0xbfffde14  |	??  -->  pointer to "/home/httpd/grades.txt" (0xbfffde14)
@@ -50,7 +50,7 @@ Exercise 4:
 		+--------------+
 		|  0xbfffde08  |	saved ebp --> saved ebp + 4
 		+--------------+
-		|	 ......	   |
+		|    ......    |
 		+--------------+
 
 	This is a return-to-lib attack. notice that arg1 are read from (ebp + 4),
