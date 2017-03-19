@@ -12,7 +12,7 @@ Exercise 3:
 Exercise 4:
 
 	1) exploit-4a.py:
-
+	use bug1.
 	stack-states:
 
 		+--------------+
@@ -35,7 +35,7 @@ Exercise 4:
 	attack.
 
 	2)exploit-4b.py
-
+	use bug2.
 	stack-state:
 		
 		+--------------+
