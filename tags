@@ -1,0 +1,42 @@
+MAX_GIDS	zookld.c	19
+MAX_SERVICES	zookd.c	12
+MAX_SERVICES	zookld.c	18
+Mrun-shellcode	run-shellcode.c	/^main(int ac, char **av)$/
+Mzookd	zookd.c	/^int main(int argc, char **argv)$/
+Mzookfs	zookfs.c	/^int main(int argc, char **argv)$/
+Mzookld	zookld.c	/^int main(int argc, char **argv)$/
+ZOOK_CONF	zookld.c	17
+cgi_gid	http.c	247
+cgi_uid	http.c	246
+dir_join	http.c	/^void dir_join(char *dst, const char *dirname, cons/
+env_deserialize	http.c	/^void env_deserialize(const char *env, size_t len)$/
+fdprintf	http.c	/^void fdprintf(int fd, char *fmt, ...)$/
+gids	zookld.c	26
+group_parse_cb	zookld.c	/^static int group_parse_cb(const char *gid_str, int/
+http_err	http.c	/^void http_err(int fd, int code, char *fmt, ...)$/
+http_read_line	http.c	/^int http_read_line(int fd, char *buf, size_t size)/
+http_request_headers	http.c	/^const char *http_request_headers(int fd)$/
+http_request_line	http.c	/^const char *http_request_line(int fd, char *reqpat/
+http_serve	http.c	/^void http_serve(int fd, const char *name)$/
+http_serve_directory	http.c	/^void http_serve_directory(int fd, const char *pn) /
+http_serve_executable	http.c	/^void http_serve_executable(int fd, const char *pn)/
+http_serve_file	http.c	/^void http_serve_file(int fd, const char *pn)$/
+http_serve_none	http.c	/^void http_serve_none(int fd, const char *pn)$/
+http_set_executable_uid_gid	http.c	/^http_set_executable_uid_gid(int uid, int gid)$/
+launch_svc	zookld.c	/^pid_t launch_svc(CONF *conf, const char *name)$/
+ngids	zookld.c	25
+nsvcs	zookd.c	13
+nsvcs	zookld.c	23
+process_client	zookd.c	/^static void process_client(int fd)$/
+recvfd	http.c	/^ssize_t recvfd(int socket, void *buffer, size_t le/
+sendfd	http.c	/^ssize_t sendfd(int socket, const void *buffer, siz/
+service_parse_cb	zookld.c	/^static int service_parse_cb(const char *name, int /
+split_path	http.c	/^void split_path(char *pn)$/
+start_server	zookld.c	/^static int start_server(const char *portstr)$/
+svcfds	zookd.c	14
+svcfds	zookld.c	21
+svcnames	zookld.c	22
+svcurls	zookd.c	15
+touch	http.c	/^void touch(const char *name) {$/
+url_decode	http.c	/^void url_decode(char *dst, const char *src)$/
+valid_cgi_script	http.c	/^valid_cgi_script(struct stat *st)$/
