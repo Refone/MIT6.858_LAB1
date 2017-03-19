@@ -1,1 +1,1 @@
-./clean-env.sh ./zookld zook-exstack.conf
+./clean-env.sh ./zookld zook-nxstack.conf
