@@ -1,1 +1,68 @@
 ## Place your answers here.
+
+Exercise 2:
+
+	exploit-2a.py make use of bug#2 [http.c:159]
+	exploit-2b.py make use of bug#1 [http.c:282]
+
+Exercise 3:
+
+	bug[1,2,4,5] can be exploited by this manner, in this exercies, we focus on bug 1.bug3 may fail by this manner because we can at most overwrite 8192 - 2048 = 6144 bytes-memory. there's possibility that it's not enough to cover the ebp and ret address.
+
+Exercise 4:
+
+	1) exploit-4a.py:
+
+	stack-states:
+
+		+--------------+
+		|			   |
+		|  0xbfffde14  |	stores "/home/httpd/grades.txt"
+		+--------------+
+		|  0xbfffde10  |	??  -->  pointer to "/home/httpd/grades.txt" (0xbfffde14)
+		+--------------+
+		|  0xbfffde0c  |	retaddr --> system exit() address
+		+--------------+
+		|	 ......	   |
+		+--------------+
+		|  0xbfffddfc  |	handler --> system unlink() address
+		+--------------+
+		|	 ......	   |
+		+--------------+
+
+	we changed the function pointer handler, when goes to handler(...), it exactly
+	execute the libc function unlink, with the context we forged.it's a call-to-libc
+	attack.
+
+	2)exploit-4b.py
+
+	stack-state:
+		
+		+--------------+
+		|			   |
+		|  0xbfffde16  |	stores "/home/httpd/grades.txt"
+		+--------------+
+		|  0xbfffde14  |	??  -->  pointer to "/home/httpd/grades.txt" (0xbfffde14)
+		+--------------+
+		|  0xbfffde10  |	??  -->  system exit() address
+		+--------------+
+		|  0xbfffde0c  |	retaddr --> system unlink() address
+		+--------------+
+		|  0xbfffde08  |	saved ebp --> saved ebp + 4
+		+--------------+
+		|	 ......	   |
+		+--------------+
+
+	This is a return-to-lib attack. notice that arg1 are read from (ebp + 4),
+	and ret address is where esp point at after ebp be pushed out.
+
+	3) other bugs:
+	
+	as the same with exercise 2. bug[1,2,4,5,] must work well, but bug3 may has
+	problem corrupt the certain stack.
+
+Exercise 5:
+	
+	other problem except buffer overflow may be the access to file,
+	a hacker can request a file like "../../something.txt", it's very dangrous
+	once a melicious user can go through our file system.

@@ -1,49 +1,85 @@
-#
-# [file:#lines]
-# desc
-#
-
-[zookd.c:1612]
-description goes here. for example, the 'buf' variable can be
-overwritten by the 'msg' variable because ...
-
-    <paste offending line(s) of code here>
-
-[http.c:1512]
-another description.
-
-    <paste offending line(s) of code here>
-
-# many more come here
-
-[http.c:311]
-if the strength of name is long enough, "strcat(pn, name)" can makes pn larger than 1024 bytes, potentially leading into a buffer overflow. pn stores the full path of the requring file(eg. "/home/httpd/lab/index.html")
-
-	strcat(pn, name);
-
-[http.c:377]
-in dir_join. long enough dirname input can overwrite dst, which stores the full path of requiring file(eg. "/home/httpd/lab/index.html"). And there's no checking in function which invoke dir_join().
-
-	strcpy(dst, dirname);
-
-[http.c:110]
-long enough buf can overwrites envp, buf is the method of request(eg. POST & GET), melicious user may input illegally.
-
-	envp += sprintf(envp, "REQUEST_METHOD=%s", buf) + 1;
-
-[http.c:112]
-same as aboving reason.
-
-	envp += sprintf(envp, "SERVER_PROTOCOL=%s", sp2) + 1;
-
-[http.c:127]
-unsafe use of sprintf.
-	
-	envp += sprintf(envp, "REQUEST_URI=%s", reqpath) + 1;
-
-[http.c:127]
-unsafe use of sprintf.
-
-	envp += sprintf(envp, "SERVER_NAME=zoobar.org") + 1;
+[http.c:282]
+in http_serve, pn has an limited length of 1024 bytes, 
+strcat do not check the length of name, which may overwrites the pn.
  
+	void http_serve(int fd, const char *name)
+	{	
+		...
+		char pn[1024];
+		...
+		strcat(pn, name);
+		...
+	}
 
+[http.c:159]
+in function http_request_headers, value has an limited length of 512 bytes,
+url_decode(char *dst, const char *src) almost copy the string from src to dst,
+we can utilize sp to overwrite value.
+
+	const char *http_request_headers(int fd)
+	{
+		...
+		char value[512];
+		...
+		url_decode(value, sp);
+		...
+	}	
+
+[zookd.c:70]
+in http.c http_request_line, sp1 split from buf[8192] which may has a similar length,
+zookd.c process_client invoke http_request_line, with a reqpath[2048],
+in http.c:105 the function url_decode(reqpath, sp1), sp1 may overwrites reqpath.
+
+	http.c:105
+	const char *http_request_line(int fd, char *reqpath, char *env, size_t *env_len)
+	{
+		static char buf[8192];
+		...
+		url_decode(reqpath, sp1);
+		...
+	}
+
+	zookd.c:70
+	static void process_client(int fd)
+	{
+		...
+		char reqpath[2048];
+		...
+		if ((errmsg = http_request_line(fd, reqpath, env, &env_len)))
+			return http_err(fd, 500, "http_request_line: %s", errmsg);
+		...
+	}
+
+[http.c:358]
+in http_serve_directory, name[1024] has length of 1024 bytes,
+function dir_join(char *dst, const char *dirname, const char *filename) simply connect dirname and filename to dst,
+so we can utilize pn to overwrite name.
+
+	void http_serve_directory(int fd, const char *pn)
+	{
+		...
+		char name[1024];
+		...
+			dir_join(name, pn, indices[i]);
+		...
+	}
+
+	void dir_join(char *dst, const char *dirname, const char *filename) {
+		strcpy(dst, dirname);
+		if (dst[strlen(dst) - 1] != '/')
+			strcat(dst, "/");
+		strcat(dst, filename);
+	}
+
+[http.c:165]
+in http_request_headers, envvar[512] may be overwrited by buf[8192] via sprintf.
+
+	const char *http_request_headers(int fd)
+	{
+		static char buf[8192];
+		...
+		char envvar[512];
+		...
+			sprintf(envvar, "HTTP_%s", buf);
+		...
+	} 
