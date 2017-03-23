@@ -7,7 +7,9 @@ Exercise 2:
 
 Exercise 3:
 
-	bug[1,2,4,5] can be exploited by this manner, in this exercies, we focus on bug 1.bug3 may fail by this manner because we can at most overwrite 8192 - 2048 = 6144 bytes-memory. there's possibility that it's not enough to cover the ebp and ret address.
+	bug[1,2,4,5] can be exploited by this manner, in this exercies, we focus on bug 1.
+	bug3 may fail by this manner because we can at most overwrite 8192 - 2048 = 6144 bytes-memory. 
+	there's possibility that it's not enough to cover the ebp and ret address.
 
 Exercise 4:
 
